@@ -1,21 +1,24 @@
 import { useState } from "react"
+import TaskInput from "./components/TaskInput"
+import TaskList from "./components/TaskList"
+import './App.css'
 
 function App() {
   const [tasks, setTasks] = useState([])
 
   const addTask = (title) => {
-    const newTask = { 
-      id: crypto.randomUUID(), 
-      title, 
+    const newTask = {
+      id: crypto.randomUUID(),
+      title,
       done: false
     }
     setTasks([...tasks, newTask])
   }
 
   const toggleTask = (id) => {
-    setTasks((prev) => 
-      prev.map((task) => 
-        task.id === id ? { ...task, done: !task.done } :task
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, done: !task.done } : task
       )
     )
   }
