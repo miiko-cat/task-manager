@@ -104,3 +104,13 @@
 .task-item-delete:hover {
   color: var(--danger);
 }
+
+.app-error {
+  margin: 0 0 1rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+}

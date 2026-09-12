@@ -4,6 +4,7 @@
   --muted: #75746e;
   --accent: #3b6ea5;
   --danger: #b23b3b;
+  --danger-bg: #fdf2f2;
 
   color-scheme: light dark;
   font-family: system-ui, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
@@ -17,6 +18,7 @@
     --muted: #9c9a92;
     --accent: #6fa3d8;
     --danger: #e07a7a;
+    --danger-bg: #2a1d1d;
   }
 }
 

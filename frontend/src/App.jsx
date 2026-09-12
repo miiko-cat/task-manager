@@ -1,30 +1,71 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import * as api from './api/tasks'
 import TaskInput from "./components/TaskInput"
 import TaskList from "./components/TaskList"
 import './App.css'
 
 function App() {
   const [tasks, setTasks] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const addTask = (title) => {
-    const newTask = {
-      id: crypto.randomUUID(),
-      title,
-      done: false
+  useEffect(() => {
+    let ignore = false
+
+    async function loadTasks() {
+      try {
+        const data = await api.fetchTasks()
+        if (!ignore) setTasks(data)
+      } catch (err) {
+        console.error(err)
+        if (!ignore) setError('タスクを読み込めませんでした。API が起動しているか確認してください。')
+      } finally {
+        if (!ignore) setIsLoading(false)
+      }
     }
-    setTasks([...tasks, newTask])
+
+    loadTasks()
+  }, [])
+
+  const addTask = async (title) => {
+    try {
+      const created = await api.createTask(title)
+      setTasks((prev) => [...prev, created])
+      setError(null)
+    } catch (err) {
+      console.error(err)
+      setError('タスクを追加できませんでした。')
+    }
   }
 
-  const toggleTask = (id) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task
+  const toggleTask = async (id) => {
+    const target = tasks.find((task) => task.id === id)
+    if (!target) return
+
+    try {
+      const updated = await api.updateTask(id, { done: !target.done })
+      setTasks((prev) =>
+        prev.map((task) =>
+          (task.id === id ? updated : task)
+        )
       )
-    )
+    } catch (err) {
+      console.error(err)
+      setError('タスクを更新できませんでした。')
+    }
   }
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id))
+  const deleteTask = async (id) => {
+    try {
+      await api.deleteTask(id)
+      setTasks((prev) =>
+        prev.filter((task) => task.id !== id)
+      )
+      setError(null)
+    } catch (err) {
+      console.error(err)
+      setError('タスクを削除できませんでした。')
+    }
   }
 
   return (
@@ -35,7 +76,18 @@ function App() {
       </header>
 
       <TaskInput onAdd={addTask} />
-      <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask} />
+
+      {error && (
+        <p className="app-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      {isLoading ? (
+        <p className="task-empty">読み込み中...</p>
+      ) : (
+        <TaskList tasks={tasks} onToggle={toggleTask} onDelete={deleteTask} />
+      )}
     </div>
   )
 }
